@@ -1,0 +1,14 @@
+.app {
+  padding: 2rem;
+  background-color: transparent;
+  display: flex;
+}
+
+.app_left{
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.5rem;
+  padding: 1rem 2rem;
+  box-shadow: 0 .4rem 1rem 0.2rem rgba(20, 20, 20, .8);
+}
+
