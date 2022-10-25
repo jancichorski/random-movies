@@ -55,9 +55,6 @@ function Form() {
         fetch(localHost, {
             method: 'POST',
             mode: 'cors',
-            // headers: {
-            //     'Content-Type': 'application/json'
-            // },
             body: JSON.stringify({
                 'media_type': mediaType,
                 'time_window': timeWindow,

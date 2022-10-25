@@ -2,7 +2,6 @@ import React from "react";
 import './Card.css'
 
 function Card({title, overView, rating, imgPath, releaseDate}){
-    const kurwa = 'asdsa';
     return(
         <div className="card">
             <div className="card__left">
