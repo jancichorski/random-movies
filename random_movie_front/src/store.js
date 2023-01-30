@@ -1,10 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
-import movieReducer from './movieSlice'
-import trialMovieReducer from './movieSlice'
+import { setupListeners } from "@reduxjs/toolkit/query";
+import  movieReducer  from "./movieSlice";
+
 
 export const store = configureStore({
     reducer: {
-        movies: movieReducer,
-        trialMovie: trialMovieReducer,
+        movies: movieReducer,    
     },
-});
+    
+})
+
+setupListeners(store.dispatch)

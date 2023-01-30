@@ -1,33 +1,57 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+
+
+
+const hostUrl = "http://127.0.0.1/trending_movies";
+
+const initialState = { 
+    movies: [],
+    body: {
+        'media_type': 'all',
+        'time_window': 'week',
+        'page': 1
+    }
+}
+
+export const getMovies = createAsyncThunk('movies/getMovies', async (fetchData) => {
+    try {
+        const response = await fetch(hostUrl, {
+            method: 'POST',
+            mode: "cors",
+            body: JSON.stringify(fetchData),
+        })
+        return response.json()
+    }
+    catch (err) {
+        console.warn(err.message)
+        return err.message
+    }
+})
 
 export const movieSlice = createSlice({
     name: 'movies',
-    initialState: {
-        movies: 0
-    },
+    initialState,
     reducers: {
-        movies: (state) => {
-            state.movies += 1
-        }
+        getBody: (state, action) => {
+            state.body = action.payload;
+        },
+    },
+    extraReducers(builder) {
+        builder
+            .addCase(getMovies.pending, (state, action) => {
+
+            })
+            .addCase(getMovies.fulfilled, (state, action) => {
+                state.movies = action.payload.results
+            })
+            .addCase(getMovies.rejected, (state, action) => {
+                console.warn(state.error.message);
+            })
     }
 })
 
-export const trialMovieSlice = createSlice({
-    name: 'trialMovie',
-    initialState: {
-        title: "Trial Title",
-        overView: "This movie is cool hueheue",
-        rating: "This movie is cool",
-        imgPath: null,
-        releaseDate: "21.37.2137"
-    },
-    reducers: {
-        trialMovie: (state) => {
-            state.overView = "This movie sucks balls"
-        }
-    }
-})
+export const selectMovies = (state) => state.movies.movies; 
 
-export const { movies, trialMovie } = movieSlice.actions
+export const { getBody } = movieSlice.actions
 
-export default trialMovieSlice.reducer
+export default movieSlice.reducer

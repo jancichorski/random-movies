@@ -1,15 +1,28 @@
 import React from "react";
 import "./Form.css";
 import { useState, useEffect } from "react";
-import Card from "./Card";
+import { useDispatch, useSelector } from "react-redux";
+import { getMovies } from "./movieSlice";
+import { selectMovies } from "./movieSlice";
 
 function Form() {
+    const stateMovies = useSelector(selectMovies)
     const [isLoading, setIsLoading] = useState(false);
     const [mediaType, setMediaType] = useState('all');
     const [page, setPage] = useState(1);
     const [timeWindow, setTimeWindow] = useState('week');
-    const [movies, setMovies] = useState([]);
-    const localHost = "http://127.0.0.1/trending_movies";
+    const dispatch = useDispatch();
+
+    const fetchData = (event) => {
+        event.preventDefault();
+        const dataToSend = {
+            'media_type': mediaType,
+            'time_window': timeWindow,
+            'page': page
+        }
+        dispatch(getMovies(dataToSend))
+    }
+
 
     const getRandomInt = (max) => {
         const randomInt = Math.floor(Math.random() * max)
@@ -19,66 +32,29 @@ function Form() {
         return randomInt
     }
 
-    const getRandomMovie = () => {
+    const getRandomMovie = (e) => {
         setPage(getRandomInt(60))
     }
 
-    const previousPage = () => {
+    const previousPage = (e) => {
         if (page > 1){
             setPage(page - 1)
         }
-        return page;
     }
 
-    const nextPage = () => {
+    const nextPage = (e) => {
         setPage(page + 1)
-        return page;
     }
 
-    const handleData = (data) => {
-        data.forEach(movie => {
-            setMovies(movies => [...movies, {
-                title: movie['title'] || movie['name'],
-                overView: movie['overview'],
-                rating: movie['vote_average'] ? (movie['vote_average']).toFixed(1) : null,
-                imgPath: movie['backdrop_path'] || movie['poster_path'],
-                releaseDate: movie['release_date'] || movie['first_air_date']
-            }])
-        });
-    }
-
-
-    const sendForm = (event) => {
-        setIsLoading(true)
-        event.preventDefault()
-        setMovies([])
-        fetch(localHost, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify({
-                'media_type': mediaType,
-                'time_window': timeWindow,
-                'page': page
-            })
-        }).then(res => {
-            const responseData = res.json();
-            setIsLoading(false);
-            return responseData;
-        }).then(responseData => {
-            console.warn(responseData.results)
-            handleData(responseData.results)
-        }).catch(err => {
-            console.warn(err);
-        })
-    }
     useEffect(() => {
 
-    },[movies])
+    }, [page])
+
 
     return (
         <div className="trending">
             <div className="trending__left">
-                <form onSubmit={sendForm} className="form">
+                <form onSubmit={fetchData} className="form">
                     <fieldset>
                         <legend>Select media type:</legend>
                         <div className="form__option">
@@ -124,20 +100,6 @@ function Form() {
                         </button>
                     </div>
                 </form>
-            </div>
-            <div className="trending__right">
-                {movies ? movies.map((user, i) => {
-                    return(
-                        <Card 
-                            key={i}
-                            title={movies[i].title}
-                            overView={movies[i].overView}
-                            rating={movies[i].rating}
-                            imgPath={movies[i].imgPath}
-                            releaseDate={movies[i].releaseDate}
-                        />
-                    )
-                }) : <div></div>}
             </div>
         </div>
     );
